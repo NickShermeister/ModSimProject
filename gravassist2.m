@@ -12,14 +12,12 @@ sunloc = [0, 0];
 
 x = states(1);
 y = states(2);
-vx = states(3)
-vy = states(4)
+vx = states(3);
+vy = states(4);
 
 R = sunloc - [x,y];
 r = norm(R);
 Rhat = R/r;
-
-r = sqrt((sunloc(2)-y)^2 + (sunloc(1)-x)^2);
 
 Fg = G*mone*mtwo/r^2*Rhat;
 Fx = Fg(1)/mtwo;
