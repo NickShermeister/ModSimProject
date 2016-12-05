@@ -9,9 +9,9 @@ function res = BinaryOrbitFlows(~, state)
 mA = .6897*1.98855e30;         %Mass of Keplar-16A (Solar Masses to kg)
 mB = .20255*1.98855e30;        %Mass of Keplar-16B (Solar Masses to kg)
 mS = 2*10^6;                   %Mass of spaceship
-rA = 451439.73*1000;           %Orbit Radius of Keplar-16A (km to m)
-rB = 157388.211*1000;          %Orbit Radius of Keplar-16B (km to m)
-a = 3.2912e7;                  %Distance between stars (.22AU to km)
+%rA = 451439.73*1000;           %Orbit Radius of Keplar-16A (km to m)
+%rB = 157388.211*1000;          %Orbit Radius of Keplar-16B (km to m)
+%a = 3.2912e7;                  %Distance between stars (.22AU to km)
 G = 6.67408 * 10^-11;          %Gravitation Constant (Nm^2/kg^2)
 
 %State Variables
@@ -27,6 +27,7 @@ xS = state(9);       %x position S (m)
 yS = state(10);      %y position S (m)
 vxS = state(11);     %x velocity S (m)
 vyS = state(12);     %y velosity S (m)
+A = state(13);        %a S (m/s^2)
 
 %Directions
 PA = [xA, yA];
@@ -60,9 +61,11 @@ dvxBdt = -Fg(1)./mB; %Rate of change of x velocity B
 dvyBdt = -Fg(2)./mB; %Rate of change of y velocity B
 dxSdt = vxS;      %Rate of change of x position S
 dySdt = vyS;      %Rate of change of y position S
-dvxSdt = -Fts(1)./mS %Rate of change of x velocity S
-dvySdt = -Fts(2)./mS %Rate of change of y velocity S
+dvxSdt = -Fts(1)./mS; %Rate of change of x velocity S
+dvySdt = -Fts(2)./mS; %Rate of change of y velocity S
 
 
-res = [dxAdt; dyAdt; dvxAdt; dvyAdt; dxBdt; dyBdt; dvxBdt; dvyBdt; dxSdt; dySdt; dvxSdt; dvySdt];
+dA = (sqrt(dvxSdt^2 + dvxSdt^2) - A);
+
+res = [dxAdt; dyAdt; dvxAdt; dvyAdt; dxBdt; dyBdt; dvxBdt; dvyBdt; dxSdt; dySdt; dvxSdt; dvySdt; dA];
 end

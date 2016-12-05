@@ -1,0 +1,42 @@
+function WhatComesAround()
+
+r = 5e10; %r in m
+speeds = 90000:1000:110000;
+angles = 0:20:360;
+
+
+numSpeeds = length(speeds);
+numAngles = length(angles);
+vf = zeros(numSpeeds, numAngles);
+theta = zeros(numSpeeds, numAngles);
+isdead = zeros(numSpeeds, numAngles);
+
+for row = 1:numSpeeds
+    for col = 1:numAngles
+        temp = BinaryOrbitPlotGrav(r, speeds(row), angles(col));
+        vf(row, col) = temp(1);
+        theta(row, col) = temp(2);
+        isdead(row, col) = temp(3);
+        if(isdead(row,col)==1)
+           vf(row, col) = -1; 
+        end
+    end
+end
+
+csvwrite('velocityfinal.csv',vf);
+csvwrite('thetas.csv',theta);
+csvwrite('isdeads.csv',isdead);
+
+pcolor(angles, speeds, vf)
+shading interp
+colorbar
+
+hold on
+
+% xlabel('Angle (degrees)');
+% ylabel('Speed (m/s)');
+% title('Final Height of Baseball');
+
+
+
+end

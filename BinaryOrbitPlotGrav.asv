@@ -19,14 +19,14 @@ options = odeset('Events', @events, 'RelTol', 1e-3);
 [T, S] = ode45(@BinaryOrbitFlowsGrav, [0, tF], state, options);     %add ,1000???
 
 
-% xA = S(:,1);         %x positions A
-% yA = S(:,2);         %y positions A
-% vxA = S(:,3);        %x velocities A
-% vyA = S(:,4);        %y velocities A
-% xB = S(:,5);         %x positions B
-% yB = S(:,6);         %y positions B
-% vxB = S(:,7);        %x velocities B
-% vyB = S(:,8);        %y velocities B
+xA = S(:,1);         %x positions A
+yA = S(:,2);         %y positions A
+vxA = S(:,3);        %x velocities A
+vyA = S(:,4);        %y velocities A
+xB = S(:,5);         %x positions B
+yB = S(:,6);         %y positions B
+vxB = S(:,7);        %x velocities B
+vyB = S(:,8);        %y velocities B
 xS = S(:,9);         %x positions S
 yS = S(:,10);         %y positions S
 vxS = S(:,11);        %x velocities S
@@ -47,7 +47,7 @@ hold on
 xlabel('x (m)')
 ylabel('y (m)')
 title('Binary Stars')
-%animate_func(T,S);
+animate_func(T,S);
 
 function animate_func(T,S)
         
@@ -88,17 +88,17 @@ if (xS(end) < 0 && yS(end) < 0)
    theta = pi+theta;
 end
 %theta = theta*100;
-%xS(end)
-%yS(end)
+xS(end)
+yS(end)
 
-res = [vf, theta, isdead];
+res = [vxS(end), vyS(end), vf, theta, isdead];
 
-csvwrite('velocityfinal.csv',vf);
+
     function [value,isterminal,direction] = events(~,h)
         a = h(13);
         b = h(9);
         c = h(10);
-        value = [60-a; 5e10-sqrt(b^2+c^2)]; 
+        value = [50-a; 5e10-sqrt(b^2+c^2)]; 
         isterminal = [1;1]; % Stop the integration if a crosses zero.
         direction = [-1;-1]; % But only if the height is decreasing.
     end
