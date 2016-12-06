@@ -1,5 +1,6 @@
 %Plotting A Binary Star System
 %He survives rn but we need to determine how fast he should be going
+%  USE ISDEAD IN ORDER TO DETERMINE IF CRASHED INTO STAR!
 function res = BinaryOrbitPlotGrav(r, v, thetad)
 clf;
 xstart = r*cosd(thetad);
@@ -7,7 +8,7 @@ ystart = r*sind(thetad);
 xv = -v*cosd(thetad);
 yv = -v*sind(thetad);
 state = [2.25e9, -4e9, .879e4, .879e4, 2.25e9, 2.8912e10, -2.99e4, -2.99e4, -5e10/sqrt(2), 5e10/sqrt(2), 80000, -80000, 0];    %Intial state of stars (m,m,m/s,m/s)
-tF = 1e6;                   %End time of simulation (s)
+tF = 1e7;                   %End time of simulation (s)
 state(9) = xstart;
 state(10) = ystart;
 state(11) = xv;
@@ -19,14 +20,14 @@ options = odeset('Events', @events, 'RelTol', 1e-3);
 [T, S] = ode45(@BinaryOrbitFlowsGrav, [0, tF], state, options);     %add ,1000???
 
 
-xA = S(:,1);         %x positions A
-yA = S(:,2);         %y positions A
-vxA = S(:,3);        %x velocities A
-vyA = S(:,4);        %y velocities A
-xB = S(:,5);         %x positions B
-yB = S(:,6);         %y positions B
-vxB = S(:,7);        %x velocities B
-vyB = S(:,8);        %y velocities B
+% xA = S(:,1);         %x positions A
+% yA = S(:,2);         %y positions A
+% vxA = S(:,3);        %x velocities A
+% vyA = S(:,4);        %y velocities A
+% xB = S(:,5);         %x positions B
+% yB = S(:,6);         %y positions B
+% vxB = S(:,7);        %x velocities B
+% vyB = S(:,8);        %y velocities B
 xS = S(:,9);         %x positions S
 yS = S(:,10);         %y positions S
 vxS = S(:,11);        %x velocities S
@@ -79,28 +80,41 @@ end
         plot(x3, y3, 'g.', 'MarkerSize', 10);
     end
 vf = sqrt(vxS(end)^2 + vyS(end)^2);
-theta = atand(yS(end)/xS(end));
+thetaxy = atand(yS(end)/xS(end));
+thetav = atand(vyS(end)/vxS(end));
+
+if(vxS(end) < 0 && vyS(end) > 0)
+   thetav = pi-thetav;
+end
+if (vxS(end) < 0 && vyS(end) < 0)
+   thetav = pi+thetav;
+end
 
 if(xS(end) < 0 && yS(end) > 0)
-   theta = pi-theta;
+   thetaxy = pi-thetaxy;
 end
 if (xS(end) < 0 && yS(end) < 0)
-   theta = pi+theta;
+   thetaxy = pi+thetaxy;
 end
 %theta = theta*100;
-xS(end)
-yS(end)
+%xS(end)
+%yS(end)
 
-res = [vxS(end), vyS(end), vf, theta, isdead];
+res = [vf, thetaxy, thetav, isdead];
 
 
     function [value,isterminal,direction] = events(~,h)
+        xA = h(1);
+        yA = h(2);
+        xB = h(5);
+        yB = h(6);
         a = h(13);
         b = h(9);
         c = h(10);
-        value = [50-a; 5e10-sqrt(b^2+c^2)]; 
-        isterminal = [1;1]; % Stop the integration if a crosses zero.
-        direction = [-1;-1]; % But only if the height is decreasing.
+        if(((xA-b == 0) &&
+        value = [60-a; 5e10-sqrt(b^2+c^2); hi]; 
+        isterminal = [1;1;1]; % Stop the integration if a crosses zero.
+        direction = [-1;-1;0]; % But only if the height is decreasing.
     end
 
 

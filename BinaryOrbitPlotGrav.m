@@ -1,5 +1,6 @@
 %Plotting A Binary Star System
 %He survives rn but we need to determine how fast he should be going
+%  USE ISDEAD IN ORDER TO DETERMINE IF CRASHED INTO STAR!
 function res = BinaryOrbitPlotGrav(r, v, thetad)
 clf;
 xstart = r*cosd(thetad);
@@ -7,12 +8,13 @@ ystart = r*sind(thetad);
 xv = -v*cosd(thetad);
 yv = -v*sind(thetad);
 state = [2.25e9, -4e9, .879e4, .879e4, 2.25e9, 2.8912e10, -2.99e4, -2.99e4, -5e10/sqrt(2), 5e10/sqrt(2), 80000, -80000, 0];    %Intial state of stars (m,m,m/s,m/s)
-tF = 1e6;                   %End time of simulation (s)
+tF = 1e7;                   %End time of simulation (s)
 state(9) = xstart;
 state(10) = ystart;
 state(11) = xv;
 state(12) = yv;
 isdead = -10;
+crashship = -1;
 
 options = odeset('Events', @events, 'RelTol', 1e-3); 
 
@@ -44,10 +46,10 @@ hold on
 % comet(xA, yA)
 % comet(xB, yB)
 % comet(xS, yS)
-xlabel('x (m)')
-ylabel('y (m)')
-title('Binary Stars')
-%animate_func(T,S);
+% xlabel('x (m)')
+% ylabel('y (m)')
+% title('Binary Stars')
+% animate_func(T,S);
 
 function animate_func(T,S)
         
@@ -79,28 +81,46 @@ end
         plot(x3, y3, 'g.', 'MarkerSize', 10);
     end
 vf = sqrt(vxS(end)^2 + vyS(end)^2);
-theta = atand(yS(end)/xS(end));
+thetaxy = atand(yS(end)/xS(end));
+thetav = atand(vyS(end)/vxS(end));
+
+if(vxS(end) < 0 && vyS(end) > 0)
+   thetav = pi-thetav;
+end
+if (vxS(end) < 0 && vyS(end) < 0)
+   thetav = pi+thetav;
+end
 
 if(xS(end) < 0 && yS(end) > 0)
-   theta = pi-theta;
+   thetaxy = pi-thetaxy;
 end
 if (xS(end) < 0 && yS(end) < 0)
-   theta = pi+theta;
+   thetaxy = pi+thetaxy;
 end
 %theta = theta*100;
 %xS(end)
 %yS(end)
 
-res = [vf, theta, isdead];
+res = [vf, thetaxy, thetav, isdead, crashship];
 
-csvwrite('velocityfinal.csv',vf);
+
     function [value,isterminal,direction] = events(~,h)
+        xA = h(1);
+        yA = h(2);
+        xB = h(5);
+        yB = h(6);
         a = h(13);
-        b = h(9);
-        c = h(10);
-        value = [60-a; 5e10-sqrt(b^2+c^2)]; 
-        isterminal = [1;1]; % Stop the integration if a crosses zero.
-        direction = [-1;-1]; % But only if the height is decreasing.
+        x = h(9);
+        y = h(10);
+        hi = 1;
+        if((sqrt((xA-x)^2+(yA-y)^2) <= 300000) | (sqrt((xB-x)^2+(yB-y)^2) <= 300000))
+            hi = 0;
+            crashship = 1;
+            isdead = 1;
+        end
+        value = [60-a; 5e10-sqrt(x^2+y^2); hi]; 
+        isterminal = [1;1;1]; % Stop the integration if a crosses zero.
+        direction = [-1;-1;0]; % But only if the height is decreasing.
     end
 
 

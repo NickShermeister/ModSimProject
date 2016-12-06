@@ -1,31 +1,37 @@
 function WhatComesAround()
 
 r = 5e10; %r in m
-speeds = 90000:1000:120000;
-angles = 0:15:360;
+speeds = 90000:1000:110000;
+angles = 0:1:360;
 
 
 numSpeeds = length(speeds);
 numAngles = length(angles);
 vf = zeros(numSpeeds, numAngles);
-theta = zeros(numSpeeds, numAngles);
+thetaxy = zeros(numSpeeds, numAngles);
+thetav = zeros(numSpeeds, numAngles);
 isdead = zeros(numSpeeds, numAngles);
+crash = zeros(numSpeeds, numAngles);
 
 for row = 1:numSpeeds
     for col = 1:numAngles-1
         temp = BinaryOrbitPlotGrav(r, speeds(row), angles(col));
         vf(row, col) = temp(1);
-        theta(row, col) = temp(2);
-        isdead(row, col) = temp(3);
-        if(isdead(row,col)==1)
-           vf(row, col) = -1; 
-        end
+        thetaxy(row, col) = temp(2);
+        thetav(row, col) = temp(3);
+        isdead(row, col) = temp(4);
+        crash(row, col) = temp(5);
+%         if(isdead(row,col)==1)
+%            vf(row, col) = NaN; 
+%         end
     end
 end
 
-csvwrite('velocityfinal15d.csv',vf);
-csvwrite('thetas15d.csv',theta);
-csvwrite('isdeads15d.csv',isdead);
+ csvwrite('velocityfinalFINAL.csv',vf);
+ csvwrite('thetaxysFINAL.csv',thetaxy);
+ csvwrite('thetavsFINAL.csv', thetav);
+ csvwrite('isdeadsFINAL.csv',isdead);
+ csvwrite('crashesFINAL.csv',isdead);
 
 pcolor(angles, speeds, vf)
 shading interp
